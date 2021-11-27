@@ -1,0 +1,39 @@
+from pyecharts.charts import Map
+from pyecharts import options as opts 
+import pandas as pd  #pandas是强大的数据处理库
+from pyecharts.render import make_snapshot
+from snapshot_selenium import snapshot
+
+# maptype='china' 只显示全国直辖市和省级
+# 数据只能是省名和直辖市的名称
+data = pd.read_excel('d:\桌面\地图数据.xlsx')
+province = list(data["Province"])
+province2 = list(data["eng"])
+year2017 = list(data["year2017"])
+keys = province2
+values = province
+namemap = dict(zip(keys, values))
+map2 = Map()
+sequence = list(zip(province,year2017))
+map2.add(
+"in 2000",data_pair=sequence,
+    maptype="china",name_map=namemap,
+    is_map_symbol_show=False , # 不显示省会的小红点
+)
+map2.set_series_opts(label_opts=opts.LabelOpts(is_show=True))
+map2.set_global_opts(
+    title_opts=opts.TitleOpts(title="Eco-efficiency of natural gas consumption "),
+    visualmap_opts=opts.VisualMapOpts(
+        # 由于数据分布较为集中，线性无法形象反映，故设置为分段显示
+        is_piecewise=True,
+        # 自定义分段区间、描述和颜色
+        pieces=[{"min": 0, "max": 0.2, "label": "≤0.2", "color": "#e0e9bb"},
+                {"min": 0.2, "max": 0.4, "label": "0.2-0.4", "color": "#eee8aa"},
+                {"min": 0.4, "max": 0.6, "label": "0.4-0.6", "color": "#c3d47c"},
+                {"min": 0.6, "max": 0.8, "label": "0.6-0.8", "color": "#7ab8cc"},
+                {"min": 0.8,  "label":" ＞0.8", "color": "#008b8b"},
+                #  不指定 max，表示 max 为无穷大
+                ]
+    )
+)
+map2.render("d:\桌面\中国地图.html")
